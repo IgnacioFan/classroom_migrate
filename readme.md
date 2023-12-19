@@ -19,6 +19,11 @@ create new migration file
 ./migrate -database "postgres://db_url" -path db/migrations down
 ```
 
+troubleshoot
+
+- Package Document
+  - https://pkg.go.dev/github.com/golang-migrate/migrate/v4@v4.16.2
+
 ## SQL Note
 
 - How does Postgres handle text column?
