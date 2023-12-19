@@ -26,6 +26,7 @@ var (
   forceVersion = migrateCmd.Int("force", 0, "force a specific version")
 
   rollbackCmd = flag.NewFlagSet("rollback", flag.ExitOnError)
+  rollbackStep = rollbackCmd.Int("step", 1, "rollback 1 step by default")
 )
 
 func main() {
@@ -52,8 +53,7 @@ func main() {
     }
   case "rollback":
     rollbackCmd.Parse(flag.Args()[1:])
-    
-    if err := runRollback(); err != nil {
+    if err := runRollback(*rollbackStep); err != nil {
       log.Fatal(err)
     }
   default:
@@ -98,7 +98,7 @@ func runMigrate(version int) error {
   return nil
 }
 
-func runRollback() error {
+func runRollback(step int) error {
   m, err := migrate.New(
     migrationPaths,
     postgresDbUrl(),
@@ -106,7 +106,7 @@ func runRollback() error {
   if err != nil {
     return err
   }
-  if err := m.Down(); err != nil {
+  if err := m.Steps(-step); err != nil {
     return err
   }
   m.Close()

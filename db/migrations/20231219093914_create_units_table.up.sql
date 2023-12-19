@@ -1,9 +1,11 @@
-create table chapters (
+create table units (
   id serial primary key,
   name varchar(255) not null,
+  description text,
+  content text not null,
   sort_key int not null,
-  course_id int references courses(id),
+  chapter_id int references chapters(id),
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp,
   deleted_at timestamp
-) 
+)
