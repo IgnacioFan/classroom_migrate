@@ -23,6 +23,7 @@ var (
   createDBName = createDBCmd.String("name", "", "given the name of the database")
 
   migrateCmd = flag.NewFlagSet("migrate", flag.ExitOnError)
+  forceVersion = migrateCmd.Int("force", 0, "force a specific version")
 
   rollbackCmd = flag.NewFlagSet("rollback", flag.ExitOnError)
 )
@@ -46,7 +47,7 @@ func main() {
     }
   case "migrate":
     migrateCmd.Parse(flag.Args()[1:])
-     if err := runMigrate(); err != nil {
+     if err := runMigrate(*forceVersion); err != nil {
       log.Fatal(err)
     }
   case "rollback":
@@ -76,7 +77,7 @@ func runCreateDB(name string) error {
   return nil
 }
 
-func runMigrate() error {
+func runMigrate(version int) error {
   m, err := migrate.New(
     migrationPaths,
     postgresDbUrl(),
@@ -84,8 +85,14 @@ func runMigrate() error {
   if err != nil {
     return err
   }
-  if err := m.Up(); err != nil {
-    return err
+  if version > 0 {
+    if err := m.Force(version); err != nil {
+      return err
+    }
+  } else {
+    if err := m.Up(); err != nil {
+      return err
+    }
   }
   m.Close()
   return nil
